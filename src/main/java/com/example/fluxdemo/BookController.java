@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -14,6 +15,8 @@ import reactor.core.publisher.Mono;
 public class BookController {
 
     private BookRepository bookRepository;
+
+    private WebClient webClient;
 
     @GetMapping("/books")
     public Flux<Book> getBooks() {
@@ -48,5 +51,21 @@ public class BookController {
                     }
                 })
                 .log();
+    }
+
+    @PostMapping("/createBook")
+    public Mono<Book> createBook() {
+        Mono<String> googleContenct = webClient.get()
+                .uri("https://google.com.vn")
+                .retrieve()
+                .bodyToMono(String.class).log();
+        Mono<Book> result = googleContenct.flatMap(body -> {
+                    Book book = new Book();
+                    book.setTitle("google");
+                    book.setContent(body);
+                    book.setIsbn("google");
+                    return bookRepository.save(book);
+                }).log();
+        return result;
     }
 }

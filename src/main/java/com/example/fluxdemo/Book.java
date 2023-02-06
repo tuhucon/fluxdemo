@@ -17,6 +17,8 @@ public class Book {
 
     public String isbn;
 
+    public String content;
+
     public Long authorId;
 
 }
