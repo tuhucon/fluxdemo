@@ -59,6 +59,12 @@ public class HelloController {
             Worker worker = new Worker(sink);
             worker.start();
         }).log();
+
+    }
+
+    @GetMapping("/context")
+    public Mono<String> context() {
+        return Mono.<String>deferContextual(ctx -> Mono.just(ctx.get("tuhucon"))).log();
     }
 
 }
